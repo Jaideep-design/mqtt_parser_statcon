@@ -49,7 +49,8 @@ def parse_packet(data_string, df):
                 "Units": units
             })
 
-        except Exception:
+        except Exception as e:
+            print("Parser error:", e, "Row:", row)
             continue
 
     return decoded_results
