@@ -50,7 +50,11 @@ def parse_packet(data_string, df):
                     except:
                         final_val = raw_segment  # Fallback to original string
 
-            decoded_results.append((short_name, final_val, units))
+            decoded_results.append({
+                "Short name": short_name,
+                "Value": final_val,
+                "Units": units
+            })
 
         except Exception:
             continue
