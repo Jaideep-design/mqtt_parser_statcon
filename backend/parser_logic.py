@@ -50,7 +50,7 @@ def parse_packet(data_string, df):
             })
 
         except Exception as e:
-            print("Parser error:", e, "Row:", row)
+            print(f"Error parsing {short_name}: {e}")
             continue
 
     return decoded_results
