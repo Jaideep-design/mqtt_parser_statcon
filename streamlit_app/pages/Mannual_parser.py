@@ -44,9 +44,11 @@ if uploaded_excel and st.button("Convert Excel → JSON"):
 st.header("2️⃣ Paste Raw Packet")
 
 raw_hex = st.text_area(
-    "Raw Packet",
-    height=150
+    "Raw Hex Packet",
+    height=150,
+    key="packet_input"
 )
+packet = st.session_state.packet_input
 
 
 # ------------------------------------------------------------------------------
@@ -57,7 +59,7 @@ st.header("3️⃣ Parse Packet")
 
 if st.button("Parse Raw Packet"):
 
-    if not raw_hex or raw_hex.strip() == "":
+    if raw_hex == "":
         st.error("Please paste a raw packet!")
 
     elif "manual_registers" not in st.session_state:
@@ -68,9 +70,6 @@ if st.button("Parse Raw Packet"):
         try:
 
             registers_df = pd.DataFrame(st.session_state.manual_registers)
-
-            # Clean packet but preserve spaces
-            packet = raw_hex.replace("\r", "").rstrip("\n")
 
             st.write("Packet length:", len(packet))
             st.write("First 50 chars:", packet[:50])
