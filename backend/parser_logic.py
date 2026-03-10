@@ -13,7 +13,8 @@ def parse_packet(data_string, df):
 
             raw_segment = data_string[start:end]
 
-            if not raw_segment:
+            # Check if the field contains only spaces
+            if raw_segment.strip() == "":
                 decoded_results.append({
                     "Short name": short_name,
                     "Value": "N/A",
@@ -27,12 +28,12 @@ def parse_packet(data_string, df):
             units = str(row['Units']) if pd.notnull(row['Units']) else ""
 
             if data_format == 'ASCII':
-                final_val = raw_segment
+                final_val = raw_segment.strip()
             else:
                 try:
-                    numeric_val = float(raw_segment)
+                    numeric_val = float(raw_segment.strip())
                 except ValueError:
-                    numeric_val = int(raw_segment, 16)
+                    numeric_val = int(raw_segment.strip(), 16)
 
                 final_val = (numeric_val * scaling) + offset
 
