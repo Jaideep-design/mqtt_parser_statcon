@@ -11,7 +11,7 @@ def parse_packet(data_string, df):
             start = int(row['Index']) - 1
             end = int(row['Total Upto'])
 
-            raw_segment = data_string[start:end].strip()
+            raw_segment = data_string[start:end]
 
             if not raw_segment:
                 decoded_results.append({
