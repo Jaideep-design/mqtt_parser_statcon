@@ -17,7 +17,7 @@ def parse_packet(data_string, df):
         try:
             short_name = str(row['Short name']).strip()
 
-            start = int(row['Index']) - 1
+            start = int(row['Index'])
             end = int(row['Total Upto'])
 
             raw_segment = data_string[start:end]
