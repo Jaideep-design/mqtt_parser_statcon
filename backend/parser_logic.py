@@ -2,14 +2,14 @@ import pandas as pd
 
 def parse_packet(data_string, df):
 
-    # Fix Excel column name whitespace issues
     df.columns = df.columns.str.strip()
-
-    # Drop rows without index info
     df = df.dropna(subset=['Index', 'Total Upto'])
 
-    # Ensure packet is long enough for slicing
-    data_string = data_string.ljust(int(df['Total Upto'].max()) + 5)
+    # Ensure packet length matches dictionary layout
+    required_length = int(df['Total Upto'].max())
+
+    if len(data_string) < required_length:
+        data_string = data_string.ljust(required_length)
 
     decoded_results = []
 
