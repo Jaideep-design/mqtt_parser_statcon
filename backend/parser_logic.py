@@ -1,6 +1,7 @@
 def parse_packet(data_string, df):
 
     df = df.dropna(subset=['Index', 'Total Upto'])
+    data_string = data_string.ljust(int(df['Total Upto'].max()) + 5)
 
     decoded_results = []
 
