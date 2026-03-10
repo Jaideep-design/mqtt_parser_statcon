@@ -1,113 +1,58 @@
-import jsonschema
-from jsonschema import validate
-from typing import List, Dict, Any
+def parse_packet(data_string, df):
+    # Read the Excel data dictionary
+    # df = pd.read_excel(excel_path)
 
+    # Ensure we only process rows with valid indices
+    df = df.dropna(subset=['Index', 'Total Upto'])
 
-REGISTER_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "short_name": {"type": "string"},
-        "index": {"type": "integer", "minimum": 0},
-        "size": {"type": "integer", "minimum": 1},  # actually END index
-        "format": {"type": "string", "enum": ["ASCII", "DEC", "HEX", "BIN"]},
-        "signed": {"type": "boolean"},
-        "scaling": {"type": "number"},
-        "offset": {"type": "number"}
-    },
-    "required": ["short_name", "index", "size", "format", "signed", "scaling", "offset"],
-}
+    decoded_results = []
 
-
-def validate_register(reg: Dict[str, Any]):
-    validate(instance=reg, schema=REGISTER_SCHEMA)
-
-
-def validate_registers(registers: List[Dict[str, Any]]):
-    for reg in registers:
-        validate_register(reg)
-
-
-def parse_value(raw_segment: str, fmt: str, signed: bool, scaling: float, offset: float):
-
-    if raw_segment is None or raw_segment.strip() == "":
-        return None
-
-    raw_segment = raw_segment.strip()
-
-    # ASCII
-    if fmt == "ASCII":
-        return raw_segment
-
-    # HEX (return raw)
-    if fmt == "HEX":
-        return raw_segment.upper()
-
-    # BIN
-    if fmt == "BIN":
+    for _, row in df.iterrows():
         try:
-            num = int(raw_segment, 16)
-            return bin(num)[2:]
-        except:
-            return raw_segment
+            short_name = str(row['Short name'])
+            # 'Index' in Excel is 1-based; Python is 0-based
+            start = int(row['Index'])
+            # 'Total Upto' is used as the end of the slice
+            end = int(row['Total Upto'])
 
-    # DEC (HEX → integer → scaling)
-    if fmt == "DEC":
-        try:
-            num = int(raw_segment, 16)
+            # Extract the raw string segment
+            raw_segment = data_string[start:end].strip()
 
-            if signed:
-                bits = len(raw_segment) * 4
-                if num >= 2**(bits-1):
-                    num -= 2**bits
+            # Skip if segment is empty
+            if not raw_segment:
+                decoded_results.append((short_name, "N/A", ""))
+                continue
 
-            value = (num * scaling) + offset
+            data_format = str(row['Data format']).strip()
+            scaling = float(row['Scaling Factor']) if pd.notnull(row['Scaling Factor']) else 1.0
+            offset = float(row['Offset']) if pd.notnull(row['Offset']) else 0.0
+            units = str(row['Units']) if pd.notnull(row['Units']) else ""
 
-            if value == int(value):
-                return int(value)
+            if data_format == 'ASCII':
+                # Literal text (like Lat/Long or RTC)
+                final_val = raw_segment
+            else:
+                # Numeric text (e.g., "0123" represents the number 123)
+                try:
+                    # Attempt base-10 conversion for ASCII numeric data
+                    numeric_val = float(raw_segment)
+                    final_val = (numeric_val * scaling) + offset
+                    # Clean up integers
+                    if final_val == int(final_val):
+                        final_val = int(final_val)
+                    else:
+                        final_val = round(final_val, 4)
+                except ValueError:
+                    # If it contains hex characters (like '3D'), parse as hex
+                    try:
+                        numeric_val = int(raw_segment, 16)
+                        final_val = (numeric_val * scaling) + offset
+                    except:
+                        final_val = raw_segment  # Fallback to original string
 
-            return round(value, 4)
+            decoded_results.append((short_name, final_val, units))
 
-        except:
-            return raw_segment
+        except Exception:
+            continue
 
-    return raw_segment
-
-
-def parse_packet(raw_packet: str, registers: List[Dict[str, Any]]):
-
-    rows = []
-
-    if raw_packet is None:
-        return rows
-
-    raw_packet = raw_packet.strip()
-
-    for reg in registers:
-
-        start = int(reg["index"])
-        end = int(reg["size"])   # IMPORTANT: size = end index
-
-        if 0 <= start < len(raw_packet):
-            segment = raw_packet[start:end]
-        else:
-            segment = ""
-
-        fmt = str(reg["format"]).upper()
-        signed = bool(reg["signed"])
-        scaling = float(reg["scaling"])
-        offset = float(reg["offset"])
-        
-        converted_value = parse_value(segment, fmt, signed, scaling, offset)
-
-        rows.append(
-            {
-                "Short name": reg["short_name"],
-                "Raw": segment,
-                "format": fmt,
-                "scaling": scaling,
-                "offset": offset,
-                "Value": converted_value,
-            }
-        )
-
-    return rows
+    return decoded_results
