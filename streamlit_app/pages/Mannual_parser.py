@@ -62,7 +62,10 @@ if st.button("Parse Raw Packet"):
 
         try:
             registers_df = pd.DataFrame(registers)
-            parsed = parse_packet(raw_hex.strip(), registers_df)
+            packet = raw_hex.replace("\r", "").rstrip("\n")
+            st.write("Packet length:", len(raw_hex))
+            st.write("First 50 chars:", raw_hex[:50])
+            parsed = parse_packet(packet, registers_df)
 
             if not parsed:
                 st.warning("Parsed output is empty.")
