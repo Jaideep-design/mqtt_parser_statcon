@@ -61,7 +61,8 @@ if st.button("Parse Raw Packet"):
         registers = st.session_state.manual_registers
 
         try:
-            parsed = parse_packet(raw_hex.strip(), registers)
+            registers_df = pd.DataFrame(registers)
+            parsed = parse_packet(raw_hex.strip(), registers_df)
 
             if not parsed:
                 st.warning("Parsed output is empty.")
