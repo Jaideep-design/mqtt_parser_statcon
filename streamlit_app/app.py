@@ -15,7 +15,10 @@ if "history" not in st.session_state:
 # ------------------------------------------------------------------------------
 st.set_page_config(page_title="AC MQTT Live Parser", layout="wide")
 
-BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL", "http://localhost:8000")
+BACKEND_BASE_URL = os.getenv(
+    "BACKEND_BASE_URL",
+    "https://mqtt-ac-parser.onrender.com"
+)
 # st.write("Backend URL =", BACKEND_BASE_URL)
 
 st.title("📡 AC Dictionary → JSON → Live MQTT Parser")
