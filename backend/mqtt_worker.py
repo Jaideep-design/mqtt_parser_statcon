@@ -56,7 +56,7 @@ def _mqtt_loop():
 
         client.tls_set(
             ca_certs=ca_path,
-            cert_reqs=ssl.CERT_REQUIRED,
+            cert_reqs=ssl.CERT_NONE,
             tls_version=ssl.PROTOCOL_TLS
         )
 
