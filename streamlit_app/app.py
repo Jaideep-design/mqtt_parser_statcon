@@ -29,6 +29,8 @@ DEFAULTS = {
     "topic": "/AC/1/EZMCISAC00097/Datalog",
     "broker": "new-mqtt-broker.ecozen.ai",
     "port": 8883,
+    "username": "ecozen_mqtt",
+    "password": "ecozen@2012",
     "registers": None,
     "latest_data": None,
     "history": []
