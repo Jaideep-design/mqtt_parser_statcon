@@ -11,10 +11,12 @@ def parse_packet(raw, registers):
         df = registers.copy()
 
     df.columns = df.columns.str.strip()
+    df['Total Upto'] = pd.to_numeric(df['Total Upto'], errors='coerce')
     df = df.dropna(subset=['Index', 'Total Upto'])
 
     # Ensure packet length matches dictionary layout
-    required_length = int(df['Total Upto'].max())
+    df['Total Upto'] = pd.to_numeric(df['Total Upto'], errors='coerce')
+    required_length = int(df['Total Upto'].dropna().max())
 
     if len(data_string) < required_length:
         data_string = data_string.ljust(required_length)
