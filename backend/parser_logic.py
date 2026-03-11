@@ -1,6 +1,14 @@
 import pandas as pd
 
-def parse_packet(data_string, df):
+import pandas as pd
+
+def parse_packet(raw, registers):
+
+    # Accept both list-of-dicts and dataframe
+    if isinstance(registers, list):
+        df = pd.DataFrame(registers)
+    else:
+        df = registers.copy()
 
     df.columns = df.columns.str.strip()
     df = df.dropna(subset=['Index', 'Total Upto'])
