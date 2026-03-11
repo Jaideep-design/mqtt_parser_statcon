@@ -26,7 +26,7 @@ st.title("📡 AC Dictionary → JSON → Live MQTT Parser")
 # ------------------------------------------------------------------------------
 DEFAULTS = {
     "device_id": "GTIPROTO00001",
-    "topic": "/GTI/STATCON/102/{device_id}/LiveData",
+    "topic": "/GTI/STATCON/102/GTIPROTO00001/LiveData",
     "broker": "new-mqtt-broker.ecozen.ai",
     "port": 8883,
     "username": "ecozen_mqtt",
@@ -56,7 +56,7 @@ with col_a:
 
     st.session_state.topic = st.text_input(
         "MQTT Subscriber Topic",
-        value=f"/AC/1/{st.session_state.device_id}/Datalog",
+        value=f"/GTI/STATCON/102/{st.session_state.device_id}/LiveData",
     )
 
 # with col_b:
