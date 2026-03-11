@@ -27,11 +27,11 @@ st.title("📡 AC Dictionary → JSON → Live MQTT Parser")
 DEFAULTS = {
     "device_id": "EZMCISAC00097",
     "topic": "/AC/1/EZMCISAC00097/Datalog",
-    "broker": "ecozen.ai",
-    "port": 1883,
+    "broker": "new-mqtt-broker.ecozen.ai",
+    "port": 8883,
     "registers": None,
     "latest_data": None,
-    "history": []   # <-- parsed message history
+    "history": []
 }
 
 for key, value in DEFAULTS.items():
