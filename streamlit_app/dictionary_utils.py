@@ -1,12 +1,11 @@
 import pandas as pd
+import numpy as np
 import json
 
 def excel_to_json(uploaded_file):
 
-    # Read Excel
     df = pd.read_excel(uploaded_file)
 
-    # Columns we want to keep
     required_columns = [
         "Sr. No.",
         "Parameter",
@@ -20,16 +19,14 @@ def excel_to_json(uploaded_file):
         "Units"
     ]
 
-    # Keep only required columns (ignore if some missing)
-    df = df[[col for col in required_columns if col in df.columns]]
+    df = df.loc[:, required_columns]
 
-    # Convert to list of dictionaries
+    # Convert NaN to None everywhere
+    df = df.where(pd.notnull(df), None)
+
     registers = df.to_dict(orient="records")
 
-    # Save JSON
     with open("output.json", "w") as f:
         json.dump(registers, f, indent=4)
-
-    print("Excel successfully converted to JSON")
 
     return registers
