@@ -18,6 +18,7 @@ def parse_packet(raw, registers):
     df['Total Upto'] = pd.to_numeric(df['Total Upto'], errors='coerce')
     required_length = int(df['Total Upto'].dropna().max())
 
+    data_string = raw
     if len(data_string) < required_length:
         data_string = data_string.ljust(required_length)
 
