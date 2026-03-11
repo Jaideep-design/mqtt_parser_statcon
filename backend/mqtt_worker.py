@@ -32,13 +32,20 @@ def _mqtt_loop():
         registers = _current_config["registers"]
 
     if not broker or not topic or not registers:
-        # Misconfigured
         return
 
     client = mqtt.Client()
 
+    # TLS configuration for secure MQTT
+    if port == 8883:
+        try:
+            client.tls_set(ca_certs="ca.crt")
+        except Exception as e:
+            print(f"[MQTT] TLS setup error: {e}")
+            return
+
     def on_connect(client, userdata, flags, rc):
-        # Subscribe to topic
+        print(f"[MQTT] Connected with result code {rc}")
         client.subscribe(topic)
 
     def on_message(client, userdata, msg):
@@ -50,18 +57,17 @@ def _mqtt_loop():
     client.on_message = on_message
 
     try:
+        print(f"[MQTT] Connecting to {broker}:{port}")
         client.connect(broker, port, 60)
     except Exception as e:
         print(f"[MQTT] Connection error: {e}")
         return
 
-    # Main loop
     while not _stop_event.is_set():
         client.loop(timeout=1.0)
         time.sleep(0.1)
 
     client.disconnect()
-
 
 def configure_and_start_mqtt(
     broker: str,
