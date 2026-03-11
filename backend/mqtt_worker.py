@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional
 
 from paho.mqtt import client as mqtt
 
-from .parser_logic import parse_packet, validate_registers
+from .parser_logic import parse_packet
 from .shared_state import update_latest
 
 # Global worker state
