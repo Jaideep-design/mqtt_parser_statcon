@@ -111,6 +111,8 @@ if st.button("🚀 Send Configuration to Backend"):
             "registers": st.session_state.registers,
             "broker": st.session_state.broker,
             "port": int(st.session_state.port),
+            "username": st.session_state.username,
+            "password": st.session_state.password
         }
         try:
             resp = requests.post(
