@@ -27,6 +27,8 @@ class ConfigurePayload(BaseModel):
     registers: List[Dict[str, Any]]
     broker: str | None = None
     port: int | None = None
+    username: str | None = None
+    password: str | None = None
 
 @app.get("/")
 def root():
@@ -56,6 +58,8 @@ def configure(payload: ConfigurePayload):
         topic=payload.topic,
         device_id=payload.device_id,
         registers=payload.registers,
+        username=payload.username,
+        password=payload.password,
     )
 
     return {
