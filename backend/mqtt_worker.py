@@ -78,13 +78,13 @@ def _mqtt_loop():
     client.disconnect()
 
 def configure_and_start_mqtt(
-    broker: str,
-    port: int,
-    topic: str,
-    device_id: str,
-    registers: List[Dict[str, Any]],
-    username: str,
-    password: str,
+    broker,
+    port,
+    topic,
+    device_id,
+    registers,
+    username=None,
+    password=None
 ):
     """
     Called by the API when user updates configuration (topic/device/dictionary).
