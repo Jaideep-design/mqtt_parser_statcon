@@ -46,15 +46,27 @@ def _mqtt_loop():
 
     # TLS for secure broker
     if port == 8883:
+        import os
         import ssl
-        client.tls_set(ca_certs="ca.crt")
-        client.tls_insecure_set(True)
+
+        base_dir = os.path.dirname(__file__)
+        ca_path = os.path.join(base_dir, "ca.crt")
+
+        print("[MQTT] Using CA certificate:", ca_path)
+
+        client.tls_set(
+            ca_certs=ca_path,
+            cert_reqs=ssl.CERT_REQUIRED,
+            tls_version=ssl.PROTOCOL_TLS
+        )
 
     def on_connect(client, userdata, flags, rc):
         print(f"[MQTT] Connected with result code {rc}")
         client.subscribe(topic)
 
     def on_message(client, userdata, msg):
+        print(f"[MQTT] Message received on {msg.topic}")
+
         raw = msg.payload.decode("utf-8", "ignore")
         parsed_rows = parse_packet(raw, registers)
         update_latest(raw, parsed_rows, device_id, topic)
