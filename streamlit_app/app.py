@@ -25,8 +25,8 @@ st.title("📡 AC Dictionary → JSON → Live MQTT Parser")
 # session_state initialization
 # ------------------------------------------------------------------------------
 DEFAULTS = {
-    "device_id": "EZMCISAC00097",
-    "topic": "/AC/1/EZMCISAC00097/Datalog",
+    "device_id": "GTIPROTO00001",
+    "topic": "/GTI/STATCON/102/{device_id}/LiveData",
     "broker": "new-mqtt-broker.ecozen.ai",
     "port": 8883,
     "username": "ecozen_mqtt",
