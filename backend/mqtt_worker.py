@@ -90,9 +90,6 @@ def configure_and_start_mqtt(
     """
     global _worker_thread, _stop_event
 
-    # Validate registers
-    validate_registers(registers)
-
     # Stop existing worker if running
     if _worker_thread and _worker_thread.is_alive():
         _stop_event.set()
