@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import json
 
 def excel_to_json(uploaded_file):
@@ -21,8 +20,8 @@ def excel_to_json(uploaded_file):
 
     df = df.loc[:, required_columns]
 
-    # Convert NaN to None everywhere
-    df = df.where(pd.notnull(df), None)
+    # Replace NaN with "NA"
+    df = df.fillna("NA")
 
     registers = df.to_dict(orient="records")
 
