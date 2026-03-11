@@ -18,6 +18,8 @@ _current_config: Dict[str, Any] = {
     "topic": None,
     "device_id": None,
     "registers": None,
+    "username": None,
+    "password": None,
 }
 
 def _mqtt_loop():
@@ -30,19 +32,25 @@ def _mqtt_loop():
         topic = _current_config["topic"]
         device_id = _current_config["device_id"]
         registers = _current_config["registers"]
+        username = _current_config["username"]
+        password = _current_config["password"]
 
     if not broker or not topic or not registers:
         return
 
     client = mqtt.Client()
 
-    # TLS configuration for secure MQTT
+    # Set authentication
+    if username and password:
+        client.username_pw_set(username, password)
+    
+    # TLS for port 8883
     if port == 8883:
-        try:
-            client.tls_set(ca_certs="ca.crt")
-        except Exception as e:
-            print(f"[MQTT] TLS setup error: {e}")
-            return
+        import ssl
+        client.tls_set(ca_certs="ca.crt")
+        client.tls_insecure_set(True)
+    
+    client.connect(broker, port, 60)
 
     def on_connect(client, userdata, flags, rc):
         print(f"[MQTT] Connected with result code {rc}")
@@ -75,6 +83,8 @@ def configure_and_start_mqtt(
     topic: str,
     device_id: str,
     registers: List[Dict[str, Any]],
+    username: str,
+    password: str,
 ):
     """
     Called by the API when user updates configuration (topic/device/dictionary).
@@ -97,6 +107,8 @@ def configure_and_start_mqtt(
         _current_config["topic"] = topic
         _current_config["device_id"] = device_id
         _current_config["registers"] = registers
+        _current_config["username"] = username
+        _current_config["password"] = password
 
     # Start new worker
     _stop_event = threading.Event()
