@@ -43,14 +43,12 @@ def _mqtt_loop():
     # Set authentication
     if username and password:
         client.username_pw_set(username, password)
-    
-    # TLS for port 8883
+
+    # TLS for secure broker
     if port == 8883:
         import ssl
         client.tls_set(ca_certs="ca.crt")
         client.tls_insecure_set(True)
-    
-    client.connect(broker, port, 60)
 
     def on_connect(client, userdata, flags, rc):
         print(f"[MQTT] Connected with result code {rc}")
