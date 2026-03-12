@@ -175,31 +175,45 @@ with col2:
 
         if parsed_rows:
             df = pd.DataFrame(parsed_rows)
-
+            
             # Only keep Short name and Value
             df_reduced = df[['Short name', 'Value']].copy()
-
-            # Transpose: shortnames -> columns
+            
+            # Get RTC value
+            rtc_row = df_reduced[df_reduced["Short name"] == "RMU_INT_RTC"]
+            
+            rtc_value = None
+            if not rtc_row.empty:
+                rtc_value = rtc_row["Value"].values[0]
+            
+            # Transpose
             df_transposed = df_reduced.set_index("Short name").T
-
-            # Create IST timestamp
-            timestamp_ist = (
-                pd.Timestamp.utcnow()
-                .tz_convert("Asia/Kolkata")
-            )
-
-            # Insert timestamp as first column
-            df_transposed.insert(0, "timestamp", timestamp_ist)
-
-            st.subheader("🧩 Latest Parsed Message (Cleaned, Transposed, IST Time)")
-            st.dataframe(df_transposed)
-
-            # Add to history if new
-            if not st.session_state.history:
+            
+            # Check if RTC changed
+            is_new_packet = rtc_value != st.session_state.last_rtc
+            
+            if is_new_packet:
+            
+                # Update RTC tracker
+                st.session_state.last_rtc = rtc_value
+            
+                # Create IST timestamp
+                timestamp_ist = pd.Timestamp.utcnow().tz_convert("Asia/Kolkata")
+            
+                # Insert timestamp
+                df_transposed.insert(0, "timestamp", timestamp_ist)
+            
+                # Store history
                 st.session_state.history.append(df_transposed)
+            
             else:
-                if not df_transposed.equals(st.session_state.history[-1]):
-                    st.session_state.history.append(df_transposed)
+                # reuse previous timestamp
+                if st.session_state.history:
+                    df_transposed.insert(
+                        0,
+                        "timestamp",
+                        st.session_state.history[-1]["timestamp"].iloc[0]
+                    )
 
         else:
             st.info("No parsed data yet – waiting for MQTT messages.")
