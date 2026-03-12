@@ -32,13 +32,15 @@ DEFAULTS = {
     "username": "ecozen_mqtt",
     "password": "ecozen@2012",
     "registers": None,
-    "latest_data": None,
-    "history": []
+    "latest_data": None
 }
 
 for key, value in DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = value
+
+if "last_rtc" not in st.session_state:
+    st.session_state.last_rtc = None
 
 
 # ------------------------------------------------------------------------------
